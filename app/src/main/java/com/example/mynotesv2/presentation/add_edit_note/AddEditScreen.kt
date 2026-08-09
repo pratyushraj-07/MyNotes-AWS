@@ -81,6 +81,7 @@ fun AddEditScreen(
     val text = if (state.noteId == null) "New Note" else "Edit Note"
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             CenterAlignedTopAppBar(

@@ -88,6 +88,7 @@ fun NotesScreen(
     var expanded by remember{ mutableStateOf( false ) }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {

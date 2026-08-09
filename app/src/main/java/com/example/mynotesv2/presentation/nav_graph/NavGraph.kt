@@ -3,12 +3,10 @@ package com.example.mynotesv2.presentation.nav_graph
 import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -27,11 +25,11 @@ fun NavGraph(
     NavHost(
         navController = navController,
         startDestination = Routes.NotesScreen.route,
-        enterTransition = { fadeIn(animationSpec = tween(300)) },
-        exitTransition ={ fadeOut(animationSpec = tween(300)) },
-        popEnterTransition = { fadeIn(animationSpec = tween(300)) },
-        popExitTransition = { fadeOut(animationSpec = tween(300)) },
-        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        modifier = Modifier.background(Color.DarkGray),
+        enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(300)) },
+        popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(300)) },
+        popEnterTransition = {slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(300))},
+        exitTransition = {slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(300))}
     ) {
         composable(
             route = Routes.NotesScreen.route,
@@ -45,14 +43,12 @@ fun NavGraph(
                     type = NavType.LongType
                     defaultValue = -1L
                 },
-            ),
-            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(300)) },
-            popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(300)) }
+            )
         ) {
             AddEditRoute(navController = navController)
         }
 
-        composable(route = Routes.SignInScreen.route) {
+        composable(route = Routes.SignInScreen.route){
             SignInRoute(navController)
         }
 
