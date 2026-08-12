@@ -99,8 +99,8 @@ fun NotesScreen(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1E1E1E),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
                 ),
                 actions = {
                     Box {
@@ -152,7 +152,7 @@ fun NotesScreen(
                 }
             )
         },
-        containerColor = Color.DarkGray,
+        containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {

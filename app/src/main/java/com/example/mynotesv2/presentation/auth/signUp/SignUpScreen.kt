@@ -1,6 +1,7 @@
 package com.example.mynotesv2.presentation.auth.signUp
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -84,13 +85,15 @@ fun SignUpScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = "Create Account",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -99,7 +102,6 @@ fun SignUpScreen(
             value = state.email,
             onValueChange = { onEvent(AuthEvent.EmailChanged(it)) },
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
@@ -110,7 +112,6 @@ fun SignUpScreen(
             onValueChange = { onEvent(AuthEvent.PasswordChanged(it)) },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
@@ -121,7 +122,6 @@ fun SignUpScreen(
         } else {
             Button(
                 onClick = { onEvent(AuthEvent.SignUp) },
-                modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Sign Up")
             }

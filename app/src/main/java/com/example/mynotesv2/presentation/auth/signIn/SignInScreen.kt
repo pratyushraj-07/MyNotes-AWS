@@ -1,6 +1,7 @@
 package com.example.mynotesv2.presentation.auth.signIn
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -79,17 +80,18 @@ fun SignInScreen(
     state: AuthState,
     onEvent: (AuthEvent) -> Unit,
 ){
-
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = "Welcome Back",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -98,7 +100,6 @@ fun SignInScreen(
             value = state.email,
             onValueChange = { onEvent(AuthEvent.EmailChanged(it)) },
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
@@ -109,7 +110,6 @@ fun SignInScreen(
             onValueChange = { onEvent(AuthEvent.PasswordChanged(it)) },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
@@ -119,8 +119,7 @@ fun SignInScreen(
             CircularProgressIndicator()
         } else {
             Button(
-                onClick = { onEvent(AuthEvent.SignIn) },
-                modifier = Modifier.fillMaxWidth()
+                onClick = { onEvent(AuthEvent.SignIn) }
             ) {
                 Text("Sign In")
             }

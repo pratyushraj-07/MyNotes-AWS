@@ -1,6 +1,7 @@
 package com.example.mynotesv2.presentation.auth.signUp
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -42,9 +43,7 @@ fun ConfirmSignUpRoute(
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
-
             when (event) {
-
                 AuthUiEvent.NavigateToHome -> {
                     navController.navigate(Routes.NotesScreen.route) {
                         popUpTo(Routes.ConfirmSignUp.route) {
@@ -83,6 +82,7 @@ fun ConfirmSignUpScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -110,7 +110,6 @@ fun ConfirmSignUpScreen(
             label = {
                 Text("Verification Code")
             },
-            modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 

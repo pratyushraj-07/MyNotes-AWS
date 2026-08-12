@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,8 +34,7 @@ fun NoteItem(
     Card(
         onClick = onNoteClick,
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1E1E1E),
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(8.dp),
         modifier = modifier
@@ -56,7 +54,8 @@ fun NoteItem(
                     modifier = Modifier.weight(1f).padding(end = 6.dp),
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 IconButton(
@@ -65,7 +64,7 @@ fun NoteItem(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
-                        tint = Color(0xFFE57373)
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }
@@ -75,7 +74,8 @@ fun NoteItem(
                 text = note.description,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Text(
