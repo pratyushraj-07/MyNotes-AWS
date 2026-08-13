@@ -51,6 +51,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mynotesv2.R
 import com.example.mynotesv2.domain.model.Note
 import com.example.mynotesv2.presentation.nav_graph.Routes
+import com.example.mynotesv2.presentation.util.rememberClickOnce
 
 @Composable
 fun NotesRoute(
@@ -84,8 +85,11 @@ fun NotesScreen(
     onSignUpCLick:() -> Unit,
     isLoggedIn: Boolean
 ) {
-
     var expanded by remember{ mutableStateOf( false ) }
+
+    val safeAddClick = rememberClickOnce { onAddClick() }
+    val safeSignInClick = rememberClickOnce { onSignInCLick() }
+    val safeSignUpClick = rememberClickOnce { onSignUpCLick() }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -136,14 +140,14 @@ fun NotesScreen(
                                     text = { Text("Sign In") },
                                     onClick = {
                                         expanded = false
-                                        onSignInCLick()
+                                        safeSignInClick()
                                     }
                                 )
                                 DropdownMenuItem(
                                     text = { Text("Sign Up") },
                                     onClick = {
                                         expanded = false
-                                        onSignUpCLick()
+                                        safeSignUpClick()
                                     }
                                 )
                             }
@@ -157,7 +161,7 @@ fun NotesScreen(
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onAddClick,
+                onClick = safeAddClick,
                 elevation = FloatingActionButtonDefaults.elevation(6.dp),
                 shape = RoundedCornerShape(24.dp)
             ) {

@@ -1,5 +1,6 @@
 package com.example.mynotesv2.presentation.add_edit_note
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,22 +54,29 @@ class AddEditViewModel @Inject constructor(
     }
 
     fun saveNote(){
+        if (_state.value.isSaving) return
+
+        _state.update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            val error = validateNote()
-            if (error != null) {
-                _uiEvent.send(AddEditUiEvent.ShowSnackBar(error))
-                return@launch
+            try{
+                val error = validateNote()
+                if (error != null) {
+                    _uiEvent.send(AddEditUiEvent.ShowSnackBar(error))
+                    return@launch
+                }
+
+                val note = Note(
+                    id = state.value.noteId ?: 0L,
+                    title = state.value.title,
+                    description = state.value.description,
+                    timestamp = System.currentTimeMillis()
+                )
+
+                repository.insertNote(note = note)
+                _uiEvent.send(AddEditUiEvent.NavigateBack)
+            }finally {
+                _state.update { it.copy(isSaving = false) }
             }
-
-            val note = Note(
-                id = state.value.noteId ?: 0L,
-                title = state.value.title,
-                description = state.value.description,
-                timestamp = System.currentTimeMillis()
-            )
-
-            repository.insertNote(note = note)
-            _uiEvent.send(AddEditUiEvent.NavigateBack)
         }
     }
 

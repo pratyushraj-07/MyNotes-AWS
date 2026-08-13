@@ -1,5 +1,6 @@
 package com.example.mynotesv2.presentation.add_edit_note
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.mynotesv2.presentation.util.rememberClickOnce
 
 @Composable
 fun AddEditRoute(
@@ -80,6 +82,9 @@ fun AddEditScreen(
 ) {
     val text = if (state.noteId == null) "New Note" else "Edit Note"
 
+    val safeSaveClick = rememberClickOnce { onSaveClick() }
+    val safeBackClick = rememberClickOnce { onBackClick() }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackBarHostState) },
@@ -94,7 +99,7 @@ fun AddEditScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = onBackClick
+                        onClick = safeBackClick
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -105,7 +110,8 @@ fun AddEditScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = onSaveClick
+                        onClick = { safeSaveClick() },
+                        enabled = !state.isSaving
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,

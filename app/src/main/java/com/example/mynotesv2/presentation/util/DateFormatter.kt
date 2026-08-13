@@ -1,4 +1,4 @@
-package com.example.mynotesv2.util
+package com.example.mynotesv2.presentation.util
 
 import java.text.SimpleDateFormat
 import java.util.Date
