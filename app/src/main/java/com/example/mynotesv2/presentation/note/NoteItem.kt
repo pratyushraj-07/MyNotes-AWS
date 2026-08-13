@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mynotesv2.domain.model.Note
-import com.example.mynotesv2.presentation.util.clickableOnce
 import com.example.mynotesv2.presentation.util.toFormattedDate
 
 @Composable
@@ -33,13 +32,12 @@ fun NoteItem(
     onDeleteClick: () -> Unit
 ) {
     Card(
+        onClick = onNoteClick,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(8.dp),
-        modifier = modifier.clickableOnce {
-            onNoteClick()
-        }
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier

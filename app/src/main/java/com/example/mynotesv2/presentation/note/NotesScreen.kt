@@ -189,6 +189,7 @@ fun NotesScreen(
                     state.notes,
                     key = { it.id }
                 ) { note ->
+                    val safeNoteClick = rememberClickOnce { onNoteClick(note) }
                     NoteItem(
                         note = note,
                         modifier = Modifier.animateItemPlacement(
@@ -197,7 +198,7 @@ fun NotesScreen(
                                 stiffness = Spring.StiffnessMedium
                             )
                         ),
-                        onNoteClick = { onNoteClick(note) },
+                        onNoteClick =  safeNoteClick,
                         onDeleteClick = { onEvent(NotesEvent.DeleteNote(note = note)) }
                     )
                 }
