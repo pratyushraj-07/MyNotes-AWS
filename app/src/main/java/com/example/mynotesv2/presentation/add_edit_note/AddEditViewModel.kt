@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,8 +29,8 @@ class AddEditViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        val noteId = savedStateHandle.get<Long>("noteId")
-        if(noteId != null && noteId != -1L){
+        val noteId = savedStateHandle.get<String>("noteId")
+        if(noteId != null && noteId != "-1"){
             viewModelScope.launch {
                 val note = repository.getNotesById(noteId)
                 if (note != null) {
@@ -66,7 +67,7 @@ class AddEditViewModel @Inject constructor(
                 }
 
                 val note = Note(
-                    id = state.value.noteId ?: 0L,
+                    id = state.value.noteId ?: UUID.randomUUID().toString(),
                     title = state.value.title,
                     description = state.value.description,
                     timestamp = System.currentTimeMillis()

@@ -95,7 +95,7 @@ fun NoteItemPreview() {
     MaterialTheme {
         NoteItem(
             note = Note(
-                id = 1,
+                id = "",
                 title = "Shopping List",
                 description = "Buy milk, eggs, and breaafsfasfsfsfsafasfsfasfsdfsdfsafsdfsfsafdafsdfsfd",
                 timestamp = System.currentTimeMillis()

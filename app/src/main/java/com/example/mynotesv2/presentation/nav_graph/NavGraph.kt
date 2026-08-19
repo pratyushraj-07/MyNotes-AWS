@@ -40,8 +40,8 @@ fun NavGraph(
             route = Routes.AddEditScreen.route + "?noteId={noteId}",
             arguments = listOf(
                 navArgument("noteId"){
-                    type = NavType.LongType
-                    defaultValue = -1L
+                    type = NavType.StringType
+                    defaultValue = "-1"
                 },
             )
         ) {

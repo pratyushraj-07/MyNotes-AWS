@@ -17,7 +17,7 @@ class NoteRepositoryImpl(
         }
     }
 
-    override suspend fun getNotesById(id: Long): Note? {
+    override suspend fun getNotesById(id: String): Note? {
         return dao.getNoteById(id)?.toNote()
     }
 
@@ -38,7 +38,7 @@ fun NoteEntity.toNote() = Note(
 )
 
 fun Note.toEntity() = NoteEntity(
-    id = id,
+    id = this.id,
     title = title,
     description = description,
     timeStamp = timestamp
