@@ -11,5 +11,6 @@ data class NoteEntity (
 
     val title:String,
     val description:String,
-    val timeStamp: Long
+    val timeStamp: Long,
+    val isSynced:Boolean
 )

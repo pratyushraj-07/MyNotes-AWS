@@ -28,18 +28,24 @@ class NoteRepositoryImpl(
     override suspend fun deleteNote(note: Note) {
         dao.deleteNote(note.toEntity())
     }
+
+    override suspend fun getUnSyncedNotes(): List<Note> {
+        return dao.getUnSyncedNotes().map { it.toNote() }
+    }
 }
 
 fun NoteEntity.toNote() = Note(
-    id = id,
-    title = title,
-    description = description,
-    timestamp = timeStamp
+    id = this.id,
+    title = this.title,
+    description = this.description,
+    timestamp = this.timeStamp,
+    isSynced = this.isSynced
 )
 
 fun Note.toEntity() = NoteEntity(
     id = this.id,
-    title = title,
-    description = description,
-    timeStamp = timestamp
+    title = this.title,
+    description = this.description,
+    timeStamp = this.timestamp,
+    isSynced = this.isSynced
 )
