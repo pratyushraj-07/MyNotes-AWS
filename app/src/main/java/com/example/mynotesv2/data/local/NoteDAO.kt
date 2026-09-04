@@ -22,4 +22,7 @@ interface NoteDAO {
     @Delete
     suspend fun deleteNote(note:NoteEntity)
 
+    @Query("SELECT * FROM notes where isSynced = 0")
+    suspend fun getUnSyncedNotes(): List<NoteEntity>
+
 }
