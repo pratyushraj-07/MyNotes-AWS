@@ -70,7 +70,8 @@ fun NotesRoute(
         onAddClick = { navController.navigate(Routes.AddEditScreen.route) },
         onSignInCLick = {navController.navigate(Routes.SignInScreen.route)},
         onSignUpCLick = {navController.navigate(Routes.SignUpScreen.route)},
-        isLoggedIn = isUserSignedIn
+        isLoggedIn = isUserSignedIn,
+        onSyncClick = { viewModel.testManualSync() }
     )
 }
 
@@ -83,7 +84,8 @@ fun NotesScreen(
     onNoteClick: (note: Note) -> Unit,
     onSignInCLick: () -> Unit,
     onSignUpCLick:() -> Unit,
-    isLoggedIn: Boolean
+    isLoggedIn: Boolean,
+    onSyncClick:()->Unit
 ) {
     var expanded by remember{ mutableStateOf( false ) }
 
@@ -125,7 +127,7 @@ fun NotesScreen(
                                     text = { Text("Sync") },
                                     onClick = {
                                         expanded = false
-                                       // onSyncClick()
+                                        onSyncClick()
                                     }
                                 )
                                 DropdownMenuItem(

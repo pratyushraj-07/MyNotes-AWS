@@ -1,5 +1,6 @@
 package com.example.mynotesv2.presentation.note
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,6 +50,22 @@ class NotesViewModel @Inject constructor(
             }
         }
     }
+
+    fun testManualSync(){
+        viewModelScope.launch {
+            try {
+                Log.d("SYNC_TEST", "Starting Push...")
+                repository.pushUnSyncedNote()
+                Log.d("SYNC_TEST", "Push complete. Starting Pull...")
+                repository.pullNotesFromCloud()
+                Log.d("SYNC_TEST", "Pull complete. Sync successful!")
+            }catch (e:Exception){
+                Log.e("SYNC_TEST", "Sync test failed", e)
+                e.printStackTrace()
+            }
+        }
+    }
+
 }
 
 //private val _isUserLoggedIn = MutableStateFlow(false)

@@ -15,4 +15,8 @@ interface NoteRepository {
 
     suspend fun getUnSyncedNotes() : List<Note>
 
+    suspend fun pushUnSyncedNote()
+
+    suspend fun pullNotesFromCloud()
+
 }

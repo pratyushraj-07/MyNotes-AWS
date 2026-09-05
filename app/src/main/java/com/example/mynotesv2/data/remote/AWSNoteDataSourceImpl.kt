@@ -1,5 +1,6 @@
 package com.example.mynotesv2.data.remote
 
+import android.util.Log
 import com.amplifyframework.api.graphql.model.ModelMutation
 import com.amplifyframework.api.graphql.model.ModelQuery
 import com.example.mynotesv2.domain.model.Note
@@ -26,6 +27,7 @@ class AWSNoteDataSourceImpl: AWSNoteDataSource {
                 )
                 downloadedNotes.add(domainNote)
             }
+            Log.d("SYNC_TEST", "AWS sent down ${downloadedNotes.size} notes")
             return downloadedNotes
         }else{
             throw Exception("Failed to fetch notes from cloud")

@@ -2,13 +2,15 @@ package com.example.mynotesv2.data.repository
 
 import com.example.mynotesv2.data.local.NoteDAO
 import com.example.mynotesv2.data.local.NoteEntity
+import com.example.mynotesv2.data.remote.AWSNoteDataSource
 import com.example.mynotesv2.domain.model.Note
 import com.example.mynotesv2.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class NoteRepositoryImpl(
-    private val dao: NoteDAO
+    private val dao: NoteDAO,
+    private val awsDataNoteSource: AWSNoteDataSource
 ): NoteRepository {
 
     override fun getAllNotes(): Flow<List<Note>> {
@@ -31,6 +33,34 @@ class NoteRepositoryImpl(
 
     override suspend fun getUnSyncedNotes(): List<Note> {
         return dao.getUnSyncedNotes().map { it.toNote() }
+    }
+
+    override suspend fun pushUnSyncedNote() {
+        val unSyncedNotes = getUnSyncedNotes()
+
+        for(note in unSyncedNotes){
+            try {
+                awsDataNoteSource.createNote(note)
+
+                val syncedNote = note.copy(isSynced = true)
+                insertNote(syncedNote)
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
+        }
+    }
+
+    override suspend fun pullNotesFromCloud() {
+        try {
+            val cloudNotes = awsDataNoteSource.fetchNotes()
+
+            for (note in cloudNotes){
+                insertNote(note)
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
+            throw e
+        }
     }
 }
 
