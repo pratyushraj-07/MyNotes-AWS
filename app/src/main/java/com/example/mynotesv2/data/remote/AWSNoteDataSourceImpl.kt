@@ -6,6 +6,7 @@ import com.amplifyframework.api.graphql.model.ModelQuery
 import com.example.mynotesv2.domain.model.Note
 import com.amplifyframework.datastore.generated.model.Note as AmplifyNote
 import com.amplifyframework.kotlin.core.Amplify
+import com.example.mynotesv2.domain.model.SyncState
 
 class AWSNoteDataSourceImpl: AWSNoteDataSource {
 
@@ -23,11 +24,11 @@ class AWSNoteDataSourceImpl: AWSNoteDataSource {
                     title = awsNote.title,
                     description = awsNote.description,
                     timestamp = System.currentTimeMillis(),
-                    isSynced = true
+                    syncState = SyncState.SYNCED
                 )
                 downloadedNotes.add(domainNote)
             }
-            Log.d("SYNC_TEST", "AWS sent down ${downloadedNotes.size} notes")
+            Log.d("SYNC_TEST", "AWS sent ${downloadedNotes.size} notes")
             return downloadedNotes
         }else{
             throw Exception("Failed to fetch notes from cloud")

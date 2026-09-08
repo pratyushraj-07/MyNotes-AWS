@@ -7,5 +7,5 @@ data class Note(
     val title: String,
     val description: String,
     val timestamp: Long,
-    val isSynced:Boolean = false
+    val syncState: SyncState = SyncState.PENDING_CREATE
 )

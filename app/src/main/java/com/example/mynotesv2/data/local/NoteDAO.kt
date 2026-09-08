@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteDAO {
 
-    @Query("SELECT * FROM notes ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM notes WHERE syncState!='PENDING_DELETE' ORDER BY timeStamp DESC")
     fun getNotes(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM notes where id = :id")
@@ -22,7 +22,7 @@ interface NoteDAO {
     @Delete
     suspend fun deleteNote(note:NoteEntity)
 
-    @Query("SELECT * FROM notes where isSynced = 0")
+    @Query("SELECT * FROM notes where syncState!='SYNCED'")
     suspend fun getUnSyncedNotes(): List<NoteEntity>
 
 }

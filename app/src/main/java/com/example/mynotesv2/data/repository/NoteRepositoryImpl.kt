@@ -4,6 +4,7 @@ import com.example.mynotesv2.data.local.NoteDAO
 import com.example.mynotesv2.data.local.NoteEntity
 import com.example.mynotesv2.data.remote.AWSNoteDataSource
 import com.example.mynotesv2.domain.model.Note
+import com.example.mynotesv2.domain.model.SyncState
 import com.example.mynotesv2.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -24,11 +25,30 @@ class NoteRepositoryImpl(
     }
 
     override suspend fun insertNote(note: Note) {
-        dao.insertNote(note.toEntity())
+        val existingNote = dao.getNoteById(note.id)
+
+        val finalState = if(existingNote!=null){
+            if (existingNote.syncState == SyncState.SYNCED) {
+                SyncState.PENDING_UPDATE
+            } else {
+                existingNote.syncState
+            }
+        }else{
+            SyncState.PENDING_CREATE
+        }
+
+        dao.insertNote(note.toEntity().copy(syncState = finalState))
     }
 
     override suspend fun deleteNote(note: Note) {
-        dao.deleteNote(note.toEntity())
+        val existingNote = dao.getNoteById(note.id) ?: return
+
+        if (existingNote.syncState == SyncState.PENDING_CREATE) {
+            dao.deleteNote(existingNote)
+        } else {
+            val softDeletedNote = existingNote.copy(syncState = SyncState.PENDING_DELETE)
+            dao.insertNote(softDeletedNote)
+        }
     }
 
     override suspend fun getUnSyncedNotes(): List<Note> {
@@ -40,10 +60,22 @@ class NoteRepositoryImpl(
 
         for(note in unSyncedNotes){
             try {
-                awsDataNoteSource.createNote(note)
+                when(note.syncState){
+                    SyncState.SYNCED -> {}
+                    SyncState.PENDING_CREATE -> {
+                        awsDataNoteSource.createNote(note)
+                        dao.insertNote(note.toEntity().copy(syncState = SyncState.SYNCED))
+                    }
+                    SyncState.PENDING_UPDATE -> {
+                        awsDataNoteSource.updateNote(note)
+                        dao.insertNote(note.toEntity().copy(syncState = SyncState.SYNCED))
+                    }
+                    SyncState.PENDING_DELETE -> {
+                        awsDataNoteSource.deleteNote(note.id)
+                        dao.deleteNote(note.toEntity())
+                    }
+                }
 
-                val syncedNote = note.copy(isSynced = true)
-                insertNote(syncedNote)
             }catch (e:Exception){
                 e.printStackTrace()
             }
@@ -55,7 +87,7 @@ class NoteRepositoryImpl(
             val cloudNotes = awsDataNoteSource.fetchNotes()
 
             for (note in cloudNotes){
-                insertNote(note)
+                dao.insertNote(note.toEntity().copy(syncState = SyncState.SYNCED))
             }
         }catch (e:Exception){
             e.printStackTrace()
@@ -69,7 +101,7 @@ fun NoteEntity.toNote() = Note(
     title = this.title,
     description = this.description,
     timestamp = this.timeStamp,
-    isSynced = this.isSynced
+    syncState = this.syncState
 )
 
 fun Note.toEntity() = NoteEntity(
@@ -77,5 +109,5 @@ fun Note.toEntity() = NoteEntity(
     title = this.title,
     description = this.description,
     timeStamp = this.timestamp,
-    isSynced = this.isSynced
+    syncState = this.syncState
 )

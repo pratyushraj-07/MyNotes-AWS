@@ -2,6 +2,7 @@ package com.example.mynotesv2.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.mynotesv2.domain.model.SyncState
 
 @Entity(tableName = "notes")
 data class NoteEntity (
@@ -12,5 +13,5 @@ data class NoteEntity (
     val title:String,
     val description:String,
     val timeStamp: Long,
-    val isSynced:Boolean
+    val syncState: SyncState = SyncState.PENDING_CREATE
 )
