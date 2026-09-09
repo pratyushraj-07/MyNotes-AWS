@@ -91,8 +91,8 @@ dependencies {
     implementation("com.amplifyframework:aws-api:2.18.0")
     implementation("com.amplifyframework:aws-auth-cognito:2.18.0")
 
-    //implementation("com.amplifyframework:core-kotlin:2.14.0")
-    //implementation("com.amplifyframework:aws-api:2.14.0")
-    //implementation("com.amplifyframework:aws-auth-cognito:2.14.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
 
 }
