@@ -3,10 +3,10 @@ package com.example.mynotesv2.presentation.note
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mynotesv2.domain.repository.AuthRepository
 import com.example.mynotesv2.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -24,6 +24,19 @@ class NotesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             authRepository.refreshAuthState()
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            isUserSignedIn.collect{signedIn->
+                if(signedIn){
+                    try {
+                        repository.pushUnSyncedNote()
+                        repository.pullNotesFromCloud()
+                    }catch (e:Exception){
+                        e.printStackTrace()
+                    }
+                }
+            }
         }
     }
 
