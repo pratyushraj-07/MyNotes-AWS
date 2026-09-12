@@ -124,13 +124,6 @@ fun NotesScreen(
                         ) {
                             if (isLoggedIn) {
                                 DropdownMenuItem(
-                                    text = { Text("Sync") },
-                                    onClick = {
-                                        expanded = false
-                                        onSyncClick()
-                                    }
-                                )
-                                DropdownMenuItem(
                                     text = { Text("Sign Out") },
                                     onClick = {
                                         onEvent(NotesEvent.SignOut)
