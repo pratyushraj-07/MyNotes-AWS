@@ -1,6 +1,7 @@
 package com.example.mynotesv2.worker
 
 import android.content.Context
+import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -17,6 +18,8 @@ class SyncWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
+            repository.pushUnSyncedNote()
+            repository.pullNotesFromCloud()
             Result.success()
         }catch (e:Exception){
             Result.retry()
