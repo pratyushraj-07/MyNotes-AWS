@@ -7,7 +7,10 @@ import com.example.mynotesv2.domain.repository.AuthRepository
 import com.example.mynotesv2.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -21,13 +24,18 @@ class NotesViewModel @Inject constructor(
 
     val isUserSignedIn = authRepository.authState
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     init {
         viewModelScope.launch {
             authRepository.refreshAuthState()
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            isUserSignedIn.collect{signedIn->
+            isUserSignedIn
+                .distinctUntilChanged{old, new->old == new}
+                .collect{signedIn->
                 if(signedIn){
                     try {
                         repository.pushUnSyncedNote()
@@ -64,17 +72,16 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun testManualSync(){
-        viewModelScope.launch {
+    fun manualSync(){
+        viewModelScope.launch(Dispatchers.IO) {
+            _isRefreshing.value = true
             try {
-                Log.d("SYNC_TEST", "Starting Push...")
                 repository.pushUnSyncedNote()
-                Log.d("SYNC_TEST", "Push complete. Starting Pull...")
                 repository.pullNotesFromCloud()
-                Log.d("SYNC_TEST", "Pull complete. Sync successful!")
             }catch (e:Exception){
-                Log.e("SYNC_TEST", "Sync test failed", e)
                 e.printStackTrace()
+            }finally {
+                _isRefreshing.value = false
             }
         }
     }

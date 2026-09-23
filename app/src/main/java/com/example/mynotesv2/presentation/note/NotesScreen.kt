@@ -31,7 +31,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,6 +65,7 @@ fun NotesRoute(
 ) {
     val state by viewModel.state.collectAsState()
     val isUserSignedIn by viewModel.isUserSignedIn.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     NotesScreen(
         state = state,
@@ -71,7 +77,8 @@ fun NotesRoute(
         onSignInCLick = {navController.navigate(Routes.SignInScreen.route)},
         onSignUpCLick = {navController.navigate(Routes.SignUpScreen.route)},
         isLoggedIn = isUserSignedIn,
-        onSyncClick = { viewModel.testManualSync() }
+        isRefreshing = isRefreshing,
+        onRefresh = viewModel::manualSync
     )
 }
 
@@ -85,13 +92,28 @@ fun NotesScreen(
     onSignInCLick: () -> Unit,
     onSignUpCLick:() -> Unit,
     isLoggedIn: Boolean,
-    onSyncClick:()->Unit
+    isRefreshing:Boolean,
+    onRefresh:()->Unit
 ) {
     var expanded by remember{ mutableStateOf( false ) }
+    val pullToRefreshState = rememberPullToRefreshState(positionalThreshold = 200.dp)
+    if(pullToRefreshState.isRefreshing){
+        LaunchedEffect(true) {
+            onRefresh()
+        }
+    }
 
     val safeAddClick = rememberClickOnce { onAddClick() }
     val safeSignInClick = rememberClickOnce { onSignInCLick() }
     val safeSignUpClick = rememberClickOnce { onSignUpCLick() }
+
+    LaunchedEffect(isRefreshing) {
+        if(isRefreshing){
+            pullToRefreshState.startRefresh()
+        }else{
+            pullToRefreshState.endRefresh()
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -167,61 +189,71 @@ fun NotesScreen(
             }
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxSize(),
-            contentPadding = PaddingValues(
-                top = padding.calculateTopPadding(),
-                bottom = padding.calculateBottomPadding(),
-                start = 10.dp,
-                end = 10.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (state.notes.isNotEmpty()) {
-                items(
-                    state.notes,
-                    key = { it.id }
-                ) { note ->
-                    val safeNoteClick = rememberClickOnce { onNoteClick(note) }
-                    NoteItem(
-                        note = note,
-                        modifier = Modifier.animateItemPlacement(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessMedium
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .nestedScroll(pullToRefreshState.nestedScrollConnection)
+        ){
+            LazyColumn(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(
+                    top = padding.calculateTopPadding(),
+                    bottom = padding.calculateBottomPadding(),
+                    start = 10.dp,
+                    end = 10.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (state.notes.isNotEmpty()) {
+                    items(
+                        state.notes,
+                        key = { it.id }
+                    ) { note ->
+                        val safeNoteClick = rememberClickOnce { onNoteClick(note) }
+                        NoteItem(
+                            note = note,
+                            modifier = Modifier.animateItemPlacement(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMedium
+                                )
+                            ),
+                            onNoteClick =  safeNoteClick,
+                            onDeleteClick = { onEvent(NotesEvent.DeleteNote(note = note)) }
+                        )
+                    }
+                } else {
+                    item {
+                        Column(
+                            modifier = Modifier.fillParentMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.empty_state))
+
+                            LottieAnimation(
+                                composition = composition,
+                                modifier = Modifier.size(250.dp)
                             )
-                        ),
-                        onNoteClick =  safeNoteClick,
-                        onDeleteClick = { onEvent(NotesEvent.DeleteNote(note = note)) }
-                    )
-                }
-            } else {
-                item {
-                    Column(
-                        modifier = Modifier.fillParentMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.empty_state))
 
-                        LottieAnimation(
-                            composition = composition,
-                            modifier = Modifier.size(250.dp)
-                        )
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Text(
-                            text = "Write Your Thoughts",
-                            fontSize = 20.sp,
-                            color = Color.Gray,
-                            fontWeight = FontWeight.Medium
-                        )
+                            Text(
+                                text = "Write Your Thoughts",
+                                fontSize = 20.sp,
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
+
+            PullToRefreshContainer(
+                state = pullToRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 }
